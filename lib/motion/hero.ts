@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { Application } from "@splinetool/runtime";
-import { one } from "./dom";
+import { canRenderHeavyScene, one } from "./dom";
 
 /**
  * Self-hosted copy of the Spline scene. The original is served from S3 uncompressed
@@ -14,6 +14,31 @@ const SCENE_URL = "/scene/x2q0.splinecode";
 export const SCENE_TIMEOUT_MS = 12_000;
 
 let app: Application | null = null;
+let boundCanvas: HTMLCanvasElement | null = null;
+
+/**
+ * Falls the hero back to its static treatment: the canvas is hidden and the CSS backdrop
+ * behind it shows through. Used both when the scene is never loaded (memory-constrained
+ * device) and when the GL context is lost after it was.
+ */
+function showStaticHero(): void {
+  const wrap = one("#splineWrap");
+  if (wrap) wrap.dataset.scene = "off";
+}
+
+/**
+ * iOS drops WebGL contexts under memory pressure and on backgrounding. Without a listener
+ * the canvas is simply frozen on its last frame and the runtime throws on the next tick.
+ * preventDefault() is what makes a later `webglcontextrestored` possible at all, but the
+ * scene's GPU resources do not survive the loss, so the hero is switched to its static
+ * treatment rather than restored.
+ */
+function onContextLost(e: Event): void {
+  e.preventDefault();
+  console.warn("[x2q0] WebGL context lost; hero falling back to its static treatment");
+  app?.stop();
+  showStaticHero();
+}
 
 /**
  * The scene's opening camera move starts the instant start() resolves. If the boot screen
@@ -38,6 +63,17 @@ export function startSpline(reduced: boolean): Promise<void> {
   const wrap = one("#splineWrap");
   released = false;
   if (!canvas) return Promise.resolve();
+
+  // Memory-constrained devices never touch the scene: no fetch, no Application, no GL
+  // context. Resolving immediately is the correct signal to the loader — the boot animation
+  // still plays out in full (runLoader never cuts phase 1 short), it just does not wait.
+  if (!canRenderHeavyScene()) {
+    showStaticHero();
+    return Promise.resolve();
+  }
+
+  boundCanvas = canvas;
+  canvas.addEventListener("webglcontextlost", onContextLost);
 
   // 'manual' renders only when requestRender() is called — under reduced motion the scene
   // is shown as a single static frame rather than an animating loop.
@@ -77,6 +113,7 @@ export function startSpline(reduced: boolean): Promise<void> {
     } catch (err) {
       // Swallowed on purpose — the page must still reveal and be usable without the scene.
       console.error("[x2q0] Spline scene failed to load:", err);
+      showStaticHero();
     }
   })();
 }
@@ -118,6 +155,8 @@ export function resizeSpline(): void {
 }
 
 export function disposeSpline(): void {
+  boundCanvas?.removeEventListener("webglcontextlost", onContextLost);
+  boundCanvas = null;
   app?.dispose();
   app = null;
   released = false;

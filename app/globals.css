@@ -162,6 +162,15 @@ a:hover {
   border: 0;
 }
 
+/* Static hero fallback — lib/motion/hero.ts sets data-scene="off" when the Spline scene is
+   never loaded (memory-constrained device), fails to fetch, or loses its GL context. The
+   backdrop itself lives in Hero.module.css; only this canvas override has to be here,
+   because `#splineWrap canvas` above is an ID selector and outranks anything the CSS module
+   can write with classes alone. */
+#splineWrap[data-scene="off"] canvas {
+  display: none;
+}
+
 /* Sections are anchor focus targets (tabindex=-1) so anchor navigation moves focus,
    not just scroll position. No visible ring for that programmatic focus. */
 section:focus {

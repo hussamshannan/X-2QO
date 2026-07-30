@@ -23,6 +23,8 @@ let app: Application | null = null;
  */
 let heldForReveal = false;
 let heroVisible = true;
+/** releaseSpline() replays the opening animation, so it must fire exactly once per load. */
+let released = false;
 
 /**
  * Creates the Spline application and begins loading the scene.
@@ -34,6 +36,7 @@ let heroVisible = true;
 export function startSpline(reduced: boolean): Promise<void> {
   const canvas = one<HTMLCanvasElement>("#splineCanvas");
   const wrap = one("#splineWrap");
+  released = false;
   if (!canvas) return Promise.resolve();
 
   // 'manual' renders only when requestRender() is called — under reduced motion the scene
@@ -84,8 +87,29 @@ export function startSpline(reduced: boolean): Promise<void> {
  * screen (someone scrolled down during loading) — the observer will start it on return.
  */
 export function releaseSpline(): void {
+  if (released) return;
+  released = true;
   heldForReveal = false;
-  if (heroVisible) app?.play();
+  if (!heroVisible || !app) return;
+  app.play();
+
+  // stop()/play() gate rendering, not the scene's animation clock — resuming shows the
+  // animation wherever wall-clock time has carried it, which by reveal time is the end.
+  // Re-firing the scene's own Start event replays it "from first state to last state"
+  // (the runtime's words), so the opening move actually begins at the reveal.
+  //
+  // Measured: fetch 78ms (cached) vs start() 518ms, so deferring start() to the reveal
+  // instead would mean half a second of empty hero. Replaying the event is the cheap path.
+  const events = app.getSplineEvents();
+  const targets = Object.entries(events)
+    .filter(([, map]) => map && "start" in map)
+    .map(([uuid]) => uuid);
+
+  if (!targets.length) {
+    console.warn("[x2q0] no Spline 'start' event found; opening animation will not replay");
+    return;
+  }
+  targets.forEach((uuid) => app?.emitEvent("start", uuid));
 }
 
 export function resizeSpline(): void {
@@ -96,6 +120,8 @@ export function resizeSpline(): void {
 export function disposeSpline(): void {
   app?.dispose();
   app = null;
+  released = false;
+  heldForReveal = false;
 }
 
 /**

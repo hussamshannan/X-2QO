@@ -24,9 +24,9 @@ export function unlockLoad(): void {
   if (el) el.style.display = "none";
   startScroll();
   ScrollTrigger.refresh();
-  // Safety net: covers the paths that never run the exit timeline — no #loader in the tree
-  // (the boot screen is currently commented out of app/page.tsx) and reduced motion.
-  // Idempotent, so calling it again after the slide already released is harmless.
+  // Fallback only: the exit timeline already released the scene as it began lifting. This
+  // covers the paths that have no exit timeline at all — no #loader in the tree, and
+  // reduced motion. releaseSpline() is once-only, so it does nothing on the normal path.
   releaseSpline();
 }
 
@@ -154,10 +154,9 @@ export function runLoader(reduced: boolean, sceneReady: Promise<void>): () => vo
       if (cancelled) return;
       setCount(100);
 
-      // Start the scene as the panel begins to lift, not after it has gone. The boot
-      // screen sliding away and the scene's opening move then read as one continuous
-      // motion. Move this to the timeline's onComplete instead if you would rather the
-      // animation begin on a fully clear screen.
+      // Replay the scene's opening animation the moment the panel starts lifting, so the
+      // reveal and the animation run together as one motion. releaseSpline() is once-only,
+      // so the unlockLoad() call at the end of this timeline is a no-op.
       releaseSpline();
 
       const out = gsap.timeline({ onComplete: () => unlockLoad() });

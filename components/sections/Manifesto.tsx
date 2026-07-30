@@ -10,7 +10,7 @@ export default function Manifesto() {
       className={styles.manifesto}
     >
       <div data-ghost="1" aria-hidden="true" className={styles.ghost}>
-        2q0
+        2qo
       </div>
       <div className={styles.grid}>
         <div className={styles.left}>

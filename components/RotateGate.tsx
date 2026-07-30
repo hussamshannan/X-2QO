@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import styles from "./RotateGate.module.css";
 
-const STORAGE_KEY = "x2q0:rotate-dismissed";
+const STORAGE_KEY = "x2qo:rotate-dismissed";
 const QUERY = "(max-width: 900px)";
 
 /**
@@ -66,7 +66,7 @@ export default function RotateGate() {
         ROTATE
       </div>
       <div className={styles.copy}>
-        X&ndash;2Q0 is built for the full width of a screen.
+        X-2QO is built for the full width of a screen.
         <br />
         Turn your device sideways, or open on desktop.
       </div>

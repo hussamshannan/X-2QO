@@ -102,7 +102,7 @@ export default function SiteChrome() {
       <header>
         <nav className={styles.nav} aria-label="Primary">
           <a href="#hero" data-cursor="link" className={styles.mark}>
-            x-2q0
+            x-2qo
           </a>
           <button
             id="menuBtn"
@@ -139,7 +139,7 @@ export default function SiteChrome() {
             </a>
           ))}
         </div>
-        <div className={styles.contact}>research@x2q0.systems</div>
+        <div className={styles.contact}>research@2qo.systems</div>
       </div>
     </>
   );

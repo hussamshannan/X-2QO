@@ -10,8 +10,10 @@ export default function Loader() {
     <div id="loader" className={styles.loader} aria-hidden="true">
       <div data-load-inner className={styles.inner}>
         <div data-load-item className={styles.top}>
-          <span className={styles.mark}>x-2q0</span>
-          <span className={styles.build}>build 2q0.41 &middot; boot sequence 03</span>
+          <span className={styles.mark}>x-2qo</span>
+          <span className={styles.build}>
+            build 2qo.41 &middot; boot sequence 03
+          </span>
         </div>
 
         <div data-load-item className={styles.middle}>
@@ -25,7 +27,9 @@ export default function Loader() {
             <span data-load-log className={styles.log}>
               initialising actuator bus
             </span>
-            <span className={styles.timing}>sense &rarr; actuation &middot; 38 ms</span>
+            <span className={styles.timing}>
+              sense &rarr; actuation &middot; 38 ms
+            </span>
           </div>
         </div>
 

@@ -16,7 +16,7 @@ export default function Hero() {
       className={styles.hero}
     >
       <h1 id="hero-heading" className="srOnly">
-        X–2Q0 — Embodied intelligence research platform
+        X–2QO — Embodied intelligence research platform
       </h1>
       <div id="splineWrap" className={styles.splineWrap}>
         {/* Decorative: #heroShield makes it non-interactive and the visually hidden <h1>

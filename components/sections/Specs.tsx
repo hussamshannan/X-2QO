@@ -104,7 +104,7 @@ const RIGHT_CELLS = [
 
 const LATENCY_ROWS = [
   {
-    label: "X–2Q0 on-device",
+    label: "X–2QO on-device",
     pct: "16",
     barClass: styles.lrowBarAccent,
     to: "38",
@@ -211,7 +211,7 @@ export default function Specs() {
           </div>
           <div className={styles.centerDivider} />
           <span data-ghost="1" aria-hidden="true" className={styles.ghostCenter}>
-            2q0
+            2qo
           </span>
           <div className={styles.heightMarker}>
             <div className={styles.heightMarkerInner}>

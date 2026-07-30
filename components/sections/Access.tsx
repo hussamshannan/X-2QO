@@ -10,7 +10,7 @@ export default function Access() {
       className={styles.access}
     >
       <div data-ghost="1" aria-hidden="true" className={styles.ghost}>
-        x–2q0
+        x–2qo
       </div>
       <div className={styles.intro}>
         <span className={styles.eyebrow}>05 — Access</span>
@@ -18,7 +18,7 @@ export default function Access() {
           RESEARCH ACCESS OPENS TO TWELVE PARTNER LABS.
         </h2>
         <a
-          href="mailto:research@x2q0.systems"
+          href="mailto:research@x2qo.systems"
           data-cursor="cta"
           className={styles.cta}
         >
@@ -33,7 +33,7 @@ export default function Access() {
           It stays inside the section: its margin-top/border-top positioning depends on it. */}
       <footer role="contentinfo" className={styles.footer}>
         <span className={styles.footerText}>
-          X–2Q0 · Embodied intelligence research platform
+          X–2QO · Embodied intelligence research platform
         </span>
         <span className={styles.footerText}>Concept · 2026</span>
       </footer>

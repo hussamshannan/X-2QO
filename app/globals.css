@@ -1,49 +1,260 @@
+/*
+ * X-2Q0 — global foundation.
+ * Ported from the <helmet><style> block of X-2Q0.dc.html.
+ *
+ * Colour tokens are named after the ALPHA USED IN THE SOURCE, so the mapping back to
+ * the original inline styles stays obvious. Two families:
+ *
+ *   --ink-NN   text on the dark background. Clamped to a minimum alpha of .5, because
+ *              rgba(237,233,227,.3) on #050505 composites to ~2.3:1 and fails WCAG AA.
+ *              Tiers .28-.45 in the source all resolve to .5 here. Approved change.
+ *   --line-NN  hairlines, borders, rules, bar tracks. NOT text. Kept verbatim — these are
+ *              decorative, and every data bar's value is also present as text, so the
+ *              graphic is never the sole means of conveying information.
+ *
+ * The loader is dark-on-light (#EDE9E3 ground), so it gets its own --dark-NN family,
+ * clamped to a minimum alpha of .62 (~#5D5D5D, ~5:1).
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #050505;
+  --ink: #ede9e3;
+  --accent: #ff6f13;
+  --accent-rgb: 255, 111, 19;
+  /* #FF6F13 on the light loader ground is 2.30:1 — it fails even the 3:1 large-text bar.
+     Same hue (23.4°), same saturation, darkened to 4.61:1. Used ONLY inside the loader.
+     Revert by setting this to #ff6f13 if the brand mark must stay exact there. */
+  --accent-on-light: #b24500;
+
+  /* text on dark — source alpha in the name, AA-clamped value */
+  --ink-28: rgba(237, 233, 227, 0.5); /* source .28 */
+  --ink-30: rgba(237, 233, 227, 0.5); /* source .3  */
+  --ink-34: rgba(237, 233, 227, 0.5); /* source .34 */
+  --ink-35: rgba(237, 233, 227, 0.5); /* source .35 */
+  --ink-38: rgba(237, 233, 227, 0.5); /* source .38 */
+  --ink-40: rgba(237, 233, 227, 0.5); /* source .4  */
+  --ink-45: rgba(237, 233, 227, 0.5); /* source .45 */
+  --ink-50: rgba(237, 233, 227, 0.5);
+  --ink-55: rgba(237, 233, 227, 0.55);
+  --ink-58: rgba(237, 233, 227, 0.58);
+  --ink-60: rgba(237, 233, 227, 0.6);
+  --ink-62: rgba(237, 233, 227, 0.62);
+
+  /* hairlines / borders / bar tracks — verbatim, decorative */
+  --line-09: rgba(237, 233, 227, 0.09);
+  --line-11: rgba(237, 233, 227, 0.11);
+  --line-12: rgba(237, 233, 227, 0.12);
+  --line-13: rgba(237, 233, 227, 0.13);
+  --line-16: rgba(237, 233, 227, 0.16);
+  --line-20: rgba(237, 233, 227, 0.2);
+  --line-22: rgba(237, 233, 227, 0.22);
+  --line-25: rgba(237, 233, 227, 0.25);
+  --line-28: rgba(237, 233, 227, 0.28);
+  --line-30: rgba(237, 233, 227, 0.3);
+  --line-40: rgba(237, 233, 227, 0.4);
+  --line-45: rgba(237, 233, 227, 0.45);
+  --line-55: rgba(237, 233, 227, 0.55);
+
+  /* text on the light loader ground — AA-clamped */
+  --dark-40: rgba(5, 5, 5, 0.62); /* source .4  */
+  --dark-45: rgba(5, 5, 5, 0.62); /* source .45 */
+  --dark-line-16: rgba(5, 5, 5, 0.16); /* rule, decorative — verbatim */
+
+  --font-display: 'Kiloy', sans-serif;
+  --font-head: 'Givonic', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Self-hosted display faces. Source used font-display:block; kept, because both faces
+   carry brand-critical glyphs (Kiloy: logo + every numeral; Givonic: every headline)
+   and a swap would be a visible flash of the wrong typeface. */
+@font-face {
+  font-family: 'Kiloy';
+  src:
+    url('/fonts/Kiloy.woff2') format('woff2'),
+    url('/fonts/Kiloy.otf') format('opentype');
+  font-display: block;
+  font-weight: 400;
+  font-style: normal;
 }
 
-html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@font-face {
+  font-family: 'Givonic';
+  src:
+    url('/fonts/Givonic-Regular.woff2') format('woff2'),
+    url('/fonts/Givonic-Regular.otf') format('opentype');
+  font-display: block;
+  font-weight: 400;
+  font-style: normal;
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
+}
+
+html,
+body {
   margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* The source sets body{cursor:none} unconditionally. Gated to fine pointers so touch and
+   coarse-pointer users are not left with no cursor at all; the custom cursor components
+   only mount behind the same query. */
+@media (pointer: fine) {
+  body,
+  body button,
+  body a {
+    cursor: none;
+  }
 }
 
 a {
-  color: inherit;
+  color: var(--accent);
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+a:hover {
+  color: var(--ink);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* The source has no focus styling at all. Restored. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@keyframes cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
   }
+  50% {
+    transform: translateY(9px);
+    opacity: 1;
+  }
+}
+
+#hero {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+#splineWrap,
+#splineWrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  border: 0;
+}
+
+/* Sections are anchor focus targets (tabindex=-1) so anchor navigation moves focus,
+   not just scroll position. No visible ring for that programmatic focus. */
+section:focus {
+  outline: none;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skipLink {
+  position: absolute;
+  left: 3vw;
+  top: -100px;
+  z-index: 10002;
+  padding: 14px 22px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: top 0.2s ease;
+}
+
+.skipLink:focus {
+  top: 18px;
+  color: var(--bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Set by ScrollMotion when the user prefers reduced motion. The custom cursor is not
+   initialised in that mode, so the native cursor has to come back — otherwise there is no
+   pointer at all. */
+html[data-reduced-motion] body,
+html[data-reduced-motion] body a,
+html[data-reduced-motion] body button {
+  cursor: auto;
+}
+
+html[data-reduced-motion] #cursorRing,
+html[data-reduced-motion] #cursorDot,
+html[data-reduced-motion] #cursorLabel {
+  display: none;
+}
+
+/*
+ * The Research section normally pins and cross-fades four absolutely-stacked layers.
+ * Without that timeline the layers would sit on top of each other, unreadable. These rules
+ * put them back into normal flow. Applied in two situations:
+ *   - html[data-flow-vectors]: set by lib/motion/vectors.ts under reduced motion
+ *   - no JavaScript at all: the same declarations are repeated in the <noscript> block in
+ *     app/layout.tsx, where an attribute selector cannot help.
+ */
+html[data-flow-vectors] #s-research {
+  height: auto;
+  overflow: visible;
+  padding: 24vh 0 12vh;
+}
+
+html[data-flow-vectors] #s-research [data-vec-grid] {
+  position: relative;
+  left: auto;
+  right: auto;
+  top: auto;
+  bottom: auto;
+  margin: 0 6vw;
+}
+
+html[data-flow-vectors] #s-research [data-vec-stack] {
+  height: auto;
+}
+
+html[data-flow-vectors] #s-research [data-vec] {
+  position: relative;
+  inset: auto;
+  padding: 6vh 0;
 }

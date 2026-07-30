@@ -1,0 +1,172 @@
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import { Application } from "@splinetool/runtime";
+import { one } from "./dom";
+
+/**
+ * Self-hosted copy of the Spline scene. The original is served from S3 uncompressed
+ * (36.2 MB, no content-encoding, no cache-control); served from public/ it gzips to
+ * ~6.9 MB and gets an immutable cache header (see next.config.ts).
+ */
+const SCENE_URL = "/scene/x2q0.splinecode";
+
+/** How long the boot screen is willing to wait for the scene before revealing anyway. */
+export const SCENE_TIMEOUT_MS = 12_000;
+
+let app: Application | null = null;
+
+/**
+ * The scene's opening camera move starts the instant start() resolves. If the boot screen
+ * is still up at that point, the animation plays out behind it and the user is shown the
+ * tail of it. So the scene is frozen the moment it loads and released by the loader, which
+ * makes the reveal and frame 0 of the animation the same instant.
+ */
+let heldForReveal = false;
+let heroVisible = true;
+
+/**
+ * Creates the Spline application and begins loading the scene.
+ *
+ * The returned promise resolving IS the "scene is ready" signal — it is what the loader
+ * gates its reveal on. It never rejects: a failed scene resolves too, so a network error
+ * can't trap the user on the boot screen forever.
+ */
+export function startSpline(reduced: boolean): Promise<void> {
+  const canvas = one<HTMLCanvasElement>("#splineCanvas");
+  const wrap = one("#splineWrap");
+  if (!canvas) return Promise.resolve();
+
+  // 'manual' renders only when requestRender() is called — under reduced motion the scene
+  // is shown as a single static frame rather than an animating loop.
+  app = new Application(canvas, { renderMode: reduced ? "manual" : "auto" });
+
+  // A canvas with no width/height attributes has a 300x150 backing store; CSS sizing only
+  // scales the box, not the buffer. Size it to the wrapper before anything renders.
+  if (wrap) app.setSize(wrap.clientWidth, wrap.clientHeight);
+
+  // interactive MUST stay true. In the runtime's start():
+  //   async start(t, { interactive: e = !0, ... }) { … if (e) { new M1(renderer, …) } … }
+  // that `M1` is the event manager, and every Spline scene animation — including this
+  // scene's opening camera move — is driven by it. Passing interactive:false skips
+  // constructing it entirely and the scene renders as a single static frame.
+  //
+  // #heroShield (z-index 2, above the canvas) is what keeps the scene from capturing
+  // pointer input, so interactivity here costs us nothing.
+  //
+  // fetch + start() rather than load() because the asset is same-origin and this keeps the
+  // buffer under our control; load() would do the same fetch internally.
+  return (async () => {
+    try {
+      const res = await fetch(SCENE_URL);
+      if (!res.ok) throw new Error(`scene ${res.status}`);
+      const buf = await res.arrayBuffer();
+      await app?.start(buf, { interactive: true });
+      if (reduced) {
+        // 'manual' render mode: one frame, no loop. Nothing to hold.
+        app?.requestRender();
+      } else {
+        // Freeze at frame 0. stop() is called synchronously after start() resolves, before
+        // rAF can tick, so the animation is held at its very beginning rather than paused
+        // somewhere into it.
+        heldForReveal = true;
+        app?.stop();
+      }
+    } catch (err) {
+      // Swallowed on purpose — the page must still reveal and be usable without the scene.
+      console.error("[x2q0] Spline scene failed to load:", err);
+    }
+  })();
+}
+
+/**
+ * Starts the held scene. Called by the loader as it begins lifting, so the animation's
+ * first frame and the reveal are one motion. Idempotent, and a no-op if the hero is not on
+ * screen (someone scrolled down during loading) — the observer will start it on return.
+ */
+export function releaseSpline(): void {
+  heldForReveal = false;
+  if (heroVisible) app?.play();
+}
+
+export function resizeSpline(): void {
+  const wrap = one("#splineWrap");
+  if (app && wrap) app.setSize(wrap.clientWidth, wrap.clientHeight);
+}
+
+export function disposeSpline(): void {
+  app?.dispose();
+  app = null;
+}
+
+/**
+ * No pin on the hero: it simply scrolls away. The scene scales UP (a push-in, not a shrink)
+ * while a solid veil fades over it.
+ *
+ * Transform + opacity only, so this stays on the compositor. Scaling a <canvas> transforms
+ * an already-rasterised texture — unlike the cross-origin iframe this replaced, where any
+ * transform forced a full re-raster of live content every frame.
+ */
+export function buildHero(reduced: boolean): () => void {
+  const wrap = one("#splineWrap");
+  const hero = one("#hero");
+
+  // Render only while the hero is actually on screen.
+  //
+  // Deliberately an IntersectionObserver rather than ScrollTrigger onEnter/onLeave: a
+  // trigger with start:'top top' is not active at scrollY === 0 (its start boundary), so
+  // returning to the very top left the scene stopped and the hero frozen on its last
+  // frame. "Is the hero intersecting the viewport" is the actual condition we want and has
+  // no boundary ambiguity.
+  const io = hero
+    ? new IntersectionObserver(
+        ([entry]) => {
+          heroVisible = entry.isIntersecting;
+          // Never start the scene while it is being held for the reveal — that is the
+          // loader's call, not the observer's.
+          if (heroVisible) {
+            if (!heldForReveal) app?.play();
+          } else {
+            app?.stop();
+          }
+        },
+        { threshold: 0 },
+      )
+    : null;
+  if (hero && io) io.observe(hero);
+
+  const cleanup = () => {
+    io?.disconnect();
+    if (wrap) wrap.style.willChange = "auto";
+  };
+
+  if (reduced) {
+    gsap.set("#heroVeil", { opacity: 0 });
+    return cleanup;
+  }
+
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: "#hero",
+        start: "top top",
+        end: "bottom top",
+        scrub: true,
+      },
+    })
+    .fromTo("#splineWrap", { scale: 1 }, { scale: 1.18, ease: "none" }, 0)
+    .fromTo("#heroVeil", { opacity: 0 }, { opacity: 1, ease: "none" }, 0)
+    .to("#cue", { opacity: 0, duration: 0.2, ease: "none" }, 0);
+
+  // will-change is set only while the hero is being scrubbed, so the promoted layer isn't
+  // held in GPU memory for the rest of the session.
+  ScrollTrigger.create({
+    trigger: "#hero",
+    start: "top top",
+    end: "bottom top",
+    onToggle: ({ isActive }) => {
+      if (wrap) wrap.style.willChange = isActive ? "transform" : "auto";
+    },
+  });
+
+  return cleanup;
+}

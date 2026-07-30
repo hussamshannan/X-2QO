@@ -1,0 +1,77 @@
+.rotate {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 26px;
+  padding: 12vw;
+  text-align: center;
+}
+
+/* Turbopack's CSS Modules localize a bare animation-name even when the module defines no
+   matching @keyframes, so `animation: cue ...` would point at a hashed name that does not
+   exist and the animation would silently never run. A local copy of the globals.css
+   keyframes keeps definition and reference hashed to the same name. */
+@keyframes cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(9px);
+    opacity: 1;
+  }
+}
+
+.device {
+  width: 44px;
+  height: 70px;
+  border: 1px solid var(--line-40);
+  border-radius: 7px;
+  animation: cue 2.4s ease-in-out infinite;
+}
+
+.title {
+  font-family: var(--font-head);
+  font-size: 34px;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.copy {
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-55);
+  line-height: 1.9;
+}
+
+/* Not in the source — the escape hatch that makes the gate non-blocking. */
+.dismiss {
+  margin-top: 4px;
+  padding: 14px 26px;
+  background: none;
+  border: 1px solid var(--line-40);
+  border-radius: 100px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  transition:
+    border-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.dismiss:hover,
+.dismiss:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}

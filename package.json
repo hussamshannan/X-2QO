@@ -1,5 +1,5 @@
 {
-  "name": "x-2q0-tmp",
+  "name": "x-2q0",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@splinetool/runtime": "1.12.98",
+    "gsap": "3.12.5",
+    "lenis": "1.1.14",
     "next": "16.2.12",
     "react": "19.2.4",
     "react-dom": "19.2.4"

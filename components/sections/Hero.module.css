@@ -1,0 +1,103 @@
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.splineWrap {
+  position: absolute;
+  inset: 0;
+  contain: strict;
+  backface-visibility: hidden;
+  /* The scroll timeline scales this. transform-origin is centred so the push-in reads as a
+     camera move rather than a corner stretch. will-change is toggled by the ScrollTrigger
+     in lib/motion/hero.ts, not set here, so the layer isn't promoted for the whole session. */
+  transform-origin: 50% 50%;
+}
+
+.splineCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  outline: none;
+}
+
+/* Swallows pointer events over the Spline canvas so it cannot capture scroll.
+   Must sit above where the iframe is later injected. */
+.heroShield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.heroVeil {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cue {
+  position: absolute;
+  left: 3vw;
+  bottom: 34px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.cueLine {
+  display: block;
+  width: 1px;
+  height: 38px;
+  background: linear-gradient(var(--accent), rgba(var(--accent-rgb), 0));
+  animation: cue 2.6s ease-in-out infinite;
+}
+
+/* Turbopack's CSS Modules localize any bare animation-name reference, even when no
+   local @keyframes matches it — global()/:global() are left as literal, unparsed
+   text in value position, so neither works as an escape hatch here (verified by
+   building this module in isolation and inspecting the emitted CSS). globals.css
+   already defines an identical @keyframes cue for other consumers (e.g. the loader's
+   rotate cue); this local copy keeps the scoped @keyframes name and the scoped
+   animation-name reference in sync within this module. */
+@keyframes cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(9px);
+    opacity: 1;
+  }
+}
+
+.cueText {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-50);
+}
+
+.caption {
+  position: absolute;
+  right: 3vw;
+  bottom: 34px;
+  text-align: right;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+  line-height: 2;
+}

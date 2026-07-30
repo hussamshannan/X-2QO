@@ -1,0 +1,436 @@
+.specs {
+  position: relative;
+  padding: 18vh 6vw 16vh;
+  overflow: hidden;
+}
+
+.eyebrowRow {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding-bottom: 52px;
+}
+
+.eyebrowNum {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--accent);
+}
+
+.eyebrowText {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-45);
+}
+
+.eyebrowRule {
+  flex: 1;
+  height: 1px;
+  background: var(--line-13);
+}
+
+.eyebrowNote {
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+}
+
+.specGrid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) clamp(210px, 20vw, 320px)
+    minmax(0, 1fr);
+  gap: clamp(20px, 2.6vw, 54px);
+  align-items: stretch;
+}
+
+.sideColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 26px;
+}
+
+/* Left column: mirrored layout — value right-aligned, then bar-then-dot. */
+.cellLeft {
+  display: grid;
+  grid-template-columns: 1fr clamp(30px, 5vw, 86px);
+  align-items: center;
+  gap: 14px;
+}
+
+/* Right column: dot-then-bar, then value left-aligned. Deliberately NOT the
+   same grid-template-columns / child order as .cellLeft. */
+.cellRight {
+  display: grid;
+  grid-template-columns: clamp(30px, 5vw, 86px) 1fr;
+  align-items: center;
+  gap: 14px;
+}
+
+.valueStackEnd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.valueStackStart {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.label {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+}
+
+.metricRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.metricValue {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.4vw, 40px);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.metricUnit {
+  font-family: var(--font-display);
+  font-size: clamp(12px, 1.1vw, 17px);
+  line-height: 1;
+  color: var(--accent);
+}
+
+.subRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.subLabel {
+  font-size: 8.5px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+}
+
+.subMetric {
+  font-family: var(--font-display);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--ink-50);
+}
+
+.barDotWrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* data-pct is 100 on every spec-cell bar, so the final width is a constant. */
+.bar {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 1px;
+  background: var(--line-28);
+}
+
+.dot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ---- centre elevation drawing ---- */
+
+.drawing {
+  position: relative;
+  min-height: clamp(430px, 60vh, 660px);
+  border-left: 1px dashed var(--line-20);
+  border-right: 1px dashed var(--line-20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawingLineTop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: var(--line-20);
+}
+
+.drawingLineBottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--line-20);
+}
+
+.measureRow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.measureShoulder {
+  top: 24%;
+}
+
+.measureHip {
+  top: 47%;
+}
+
+.measureKnee {
+  top: 70%;
+}
+
+.measureRule {
+  flex: 1;
+  height: 1px;
+  background: var(--line-13);
+}
+
+.measureLabel {
+  font-size: 8.5px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+  white-space: nowrap;
+}
+
+.centerDivider {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line-09);
+}
+
+.ghostCenter {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: clamp(90px, 11vw, 170px);
+  line-height: 0.8;
+  color: var(--ink);
+  opacity: 0.05;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.heightMarker {
+  position: absolute;
+  left: -1px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  transform: translateX(-22px);
+}
+
+.heightMarkerInner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Source value: rgba(255,111,19,.5) — composed from --accent-rgb since this
+   is an accent-coloured rule, not an ink/line hairline. */
+.heightAccentLine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(var(--accent-rgb), 0.5);
+}
+
+.heightLabel {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--accent);
+  background: var(--bg);
+  padding: 6px 0;
+  position: relative;
+}
+
+.footLabel {
+  position: absolute;
+  left: 0;
+  bottom: -26px;
+  font-size: 8.5px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+}
+
+.sheetLabel {
+  position: absolute;
+  right: 0;
+  top: -26px;
+  font-size: 8.5px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+}
+
+/* ---- decision latency ---- */
+
+.latencyGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
+  gap: 5vw;
+  align-items: start;
+  padding-top: 13vh;
+}
+
+.latencyIntro {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.latencyHeading {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 400;
+  font-size: clamp(24px, 2.4vw, 40px);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.latencyText {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ink-55);
+}
+
+.latencyRows {
+  display: flex;
+  flex-direction: column;
+}
+
+.lrow {
+  display: grid;
+  grid-template-columns: minmax(170px, 230px) minmax(0, 1fr) 92px;
+  gap: 3vw;
+  align-items: center;
+  padding: 24px 0;
+  border-top: 1px solid var(--line-11);
+}
+
+.lrowLabel {
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-55);
+}
+
+.lrowTrack {
+  position: relative;
+  height: 11px;
+}
+
+.lrowTrackBg {
+  position: absolute;
+  left: 0;
+  top: 5px;
+  right: 0;
+  height: 1px;
+  background: var(--line-09);
+}
+
+.lrowBar {
+  position: absolute;
+  left: 0;
+  top: 5px;
+  height: 1px;
+  width: var(--pct);
+}
+
+.lrowBarAccent {
+  background: var(--accent);
+}
+
+.lrowBarMid {
+  background: var(--line-45);
+}
+
+.lrowBarLine22 {
+  background: var(--line-22);
+}
+
+.lrowTick {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 11px;
+  background: var(--line-30);
+}
+
+.lrowValue {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.lrowNumber {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.lrowUnit {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+}
+
+.latencyCloseRule {
+  height: 1px;
+  background: var(--line-11);
+}

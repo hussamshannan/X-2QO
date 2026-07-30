@@ -1,0 +1,85 @@
+.log {
+  position: relative;
+  padding: 0 6vw 20vh;
+  overflow: hidden;
+}
+
+.ghost {
+  position: absolute;
+  left: -2vw;
+  bottom: 2%;
+  font-family: var(--font-display);
+  font-size: 22vw;
+  line-height: 0.8;
+  color: var(--ink);
+  opacity: 0.03;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.eyebrowRow {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding-bottom: 70px;
+}
+
+.eyebrowNum {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--accent);
+}
+
+.eyebrowText {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-45);
+}
+
+.eyebrowRule {
+  flex: 1;
+  height: 1px;
+  background: var(--line-13);
+}
+
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2vw;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line-16);
+}
+
+/* The first card's top border is the accent colour — intentional, not a mistake. */
+.row:first-child {
+  border-top-color: var(--accent);
+}
+
+.date {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.slash {
+  color: var(--accent);
+}
+
+.text {
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--ink-58);
+}

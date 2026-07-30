@@ -1,0 +1,207 @@
+.research {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.ghost {
+  position: absolute;
+  left: -3vw;
+  bottom: -4%;
+  font-family: var(--font-head);
+  font-size: 19vw;
+  line-height: 0.8;
+  color: var(--ink);
+  opacity: 0.028;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.eyebrowRow {
+  position: absolute;
+  left: 6vw;
+  top: 12vh;
+  z-index: 3;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.eyebrowNum {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--accent);
+}
+
+.eyebrowText {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-45);
+}
+
+.contentGrid {
+  position: absolute;
+  left: 6vw;
+  right: 6vw;
+  top: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5vw;
+  align-items: center;
+}
+
+.vecStack {
+  position: relative;
+  height: 62vh;
+}
+
+/*
+ * All four vectors are position:absolute;inset:0, stacked directly on top of each
+ * other. Do not set opacity/visibility here — the motion layer owns cross-fading them
+ * with gsap autoAlpha. Leaving them all visible in CSS keeps the no-JS page readable.
+ */
+.vec {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 5vw;
+  align-items: center;
+  align-content: center;
+}
+
+/* Source alpha .09 has no --ink-* token (lowest defined is --ink-28). This giant
+   background numeral is decorative, same tier as the ghost type, so the --line-09
+   token (identical rgba(237,233,227,0.09) value, just named for hairline usage) is
+   reused here rather than inventing a new token or hardcoding the colour. */
+.vecNum {
+  font-family: var(--font-display);
+  font-size: clamp(90px, 15vw, 240px);
+  line-height: 0.78;
+  color: var(--line-09);
+}
+
+.vecBody {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.vecTitle {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 400;
+  font-size: clamp(38px, 6vw, 104px);
+  line-height: 0.94;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+}
+
+.vecText {
+  margin: 0;
+  max-width: 30em;
+  font-size: clamp(14px, 1.05vw, 17px);
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--ink-60);
+}
+
+.statsRow {
+  display: flex;
+  gap: 56px;
+  padding-top: 6px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.statLabel {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-38);
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.indexCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-bottom: 2vh;
+}
+
+.indexLabel {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-28);
+  padding-bottom: 16px;
+}
+
+.vjumpBtn {
+  display: grid;
+  grid-template-columns: auto 34px;
+  gap: 14px;
+  align-items: center;
+  justify-items: end;
+  padding: 11px 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+}
+
+.vinum {
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ink-30);
+}
+
+.vitick {
+  display: block;
+  width: 16px;
+  height: 1px;
+  background: var(--line-22);
+}
+
+.scrollHint {
+  position: absolute;
+  left: 6vw;
+  bottom: 9vh;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.scrollLine {
+  display: block;
+  width: 34px;
+  height: 1px;
+  background: var(--line-25);
+}
+
+.scrollText {
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-34);
+}

@@ -1,0 +1,112 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 3vw;
+  mix-blend-mode: difference;
+}
+
+.mark {
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.menuBtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bar {
+  display: block;
+  width: 22px;
+  height: 1px;
+  background: var(--ink);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 890;
+  background: var(--bg);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 6vw;
+  opacity: 0;
+}
+
+.indexLabel {
+  position: absolute;
+  left: 6vw;
+  top: 16vh;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-35);
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.link {
+  font-family: var(--font-head);
+  font-size: clamp(48px, 7.6vw, 132px);
+  line-height: 0.94;
+  color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  gap: 26px;
+}
+
+.linkAccent {
+  color: var(--accent);
+}
+
+.linkNum {
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+
+.linkAccent .linkNum {
+  color: var(--ink-40);
+}
+
+.contact {
+  position: absolute;
+  left: 6vw;
+  bottom: 12vh;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: var(--ink-40);
+}

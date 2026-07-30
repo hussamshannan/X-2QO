@@ -1,0 +1,78 @@
+.manifesto {
+  position: relative;
+  padding: 24vh 6vw 20vh;
+  overflow: hidden;
+}
+
+.ghost {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: 30vw;
+  line-height: 0.8;
+  color: var(--ink);
+  opacity: 0.03;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6vw;
+  align-items: end;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.eyebrow {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 400;
+  font-size: clamp(44px, 7vw, 124px);
+  line-height: 0.9;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding-bottom: 14px;
+  border-left: 1px solid var(--line-13);
+  padding-left: 3vw;
+}
+
+.body {
+  margin: 0;
+  font-size: clamp(14px, 1.05vw, 17px);
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--ink-62);
+}
+
+.subline {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-35);
+}

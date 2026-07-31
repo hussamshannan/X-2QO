@@ -171,6 +171,24 @@ a:hover {
   display: none;
 }
 
+/* Reduced-resolution hero — lib/motion/hero.ts sets data-scene-quality="reduced" on phones
+   and tablets, where the scene's memory use is the difference between rendering and having
+   the tab killed.
+
+   The runtime derives its drawing buffer from the canvas element's own box (it keeps a
+   ResizeObserver on it), so shrinking the box is what actually shrinks the buffer — calling
+   the runtime's setSize() is reverted the next time that observer fires. At 60% the buffer
+   is 36% of the pixels; the transform scales it back over the full wrapper, and on a 3x
+   phone the result still resolves at an effective 1.8x.
+
+   The !important matches `#splineWrap canvas` above, which is itself !important. */
+#splineWrap[data-scene-quality="reduced"] canvas {
+  width: 60% !important;
+  height: 60% !important;
+  transform: scale(1.66667);
+  transform-origin: 0 0;
+}
+
 /* Sections are anchor focus targets (tabindex=-1) so anchor navigation moves focus,
    not just scroll position. No visible ring for that programmatic focus. */
 section:focus {

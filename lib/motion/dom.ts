@@ -26,12 +26,16 @@ export function hasFinePointer(): boolean {
 const PHONE_MAX_PX = 1024;
 
 /**
- * Whether this device should be given the Spline scene at all.
+ * Whether this device is one where the Spline scene has to be treated as risky.
  *
- * The scene binary is 36.2 MB uncompressed. Decoding it into an ArrayBuffer and then into
- * WebGL textures overruns the per-tab memory ceiling in iOS Safari, which kills and reloads
- * the tab ("A problem repeatedly occurred"). There is no way to catch that from JS — the
- * only fix is not to load the scene on devices that cannot hold it.
+ * The scene binary is 36.2 MB and expands well beyond that once the runtime uploads it to
+ * the GPU. On iOS Safari that can overrun the per-tab memory ceiling, killing and reloading
+ * the tab ("A problem repeatedly occurred"). The kill is not catchable from JS.
+ *
+ * This does NOT decide whether the scene loads — lib/motion/sceneGuard.ts does that. This
+ * only says which branch the device is on: constrained devices still get the real scene,
+ * but at a reduced render resolution and behind a crash breaker. Everything else is
+ * untouched and loads exactly as it always has.
  *
  * Two signals, because no single one covers every engine:
  *   - navigator.deviceMemory is the direct measure, but it is Chromium-only; Safari and
@@ -41,7 +45,7 @@ const PHONE_MAX_PX = 1024;
  *     Touchscreen laptops are not caught, because their primary pointer is the trackpad
  *     and so reports `pointer: fine`.
  *
- * Within touch-first hardware, either of two things is enough to skip the scene:
+ * Within touch-first hardware, either of two things marks the device constrained:
  *
  *   - No fine pointer anywhere (`any-pointer: fine`), i.e. no mouse is attached; or
  *   - A viewport at or under PHONE_MAX_PX.
@@ -49,22 +53,19 @@ const PHONE_MAX_PX = 1024;
  * The width term is not redundant. `any-pointer: fine` is not a trustworthy "this is a
  * desktop" signal on WebKit — it has reported fine for a paired Bluetooth mouse and, in
  * some versions, for the Apple Pencil. If that happens on a phone, the pointer term alone
- * silently stops gating and the tab dies again. Width catches every iPhone in either
+ * silently stops classifying it as constrained. Width catches every iPhone in either
  * orientation (the widest is 956px in landscape) regardless of what the pointer media
  * features say, so the two terms cover each other's failure mode.
- *
- * A tablet with no mouse attached is excluded too. That is deliberate — the same memory
- * ceiling applies there, and a static hero is better than a tab that reloads itself.
  */
-export function canRenderHeavyScene(): boolean {
-  if (typeof window === "undefined") return false;
+export function isMemoryConstrainedDevice(): boolean {
+  if (typeof window === "undefined") return true;
 
   const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
-  if (typeof mem === "number" && mem < 4) return false;
+  if (typeof mem === "number" && mem < 4) return true;
 
-  if (!window.matchMedia("(pointer: coarse)").matches) return true;
+  if (!window.matchMedia("(pointer: coarse)").matches) return false;
 
   const noMouse = !window.matchMedia("(any-pointer: fine)").matches;
   const phoneSized = window.matchMedia(`(max-width: ${PHONE_MAX_PX}px)`).matches;
-  return !(noMouse || phoneSized);
+  return noMouse || phoneSized;
 }

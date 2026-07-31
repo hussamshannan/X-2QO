@@ -1,7 +1,13 @@
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { Application } from "@splinetool/runtime";
-import { canRenderHeavyScene, one } from "./dom";
+import { isMemoryConstrainedDevice, one } from "./dom";
+import {
+  clearPendingAttempt,
+  markSceneAttemptStarted,
+  markSceneAttemptSucceeded,
+  sceneAttemptAllowed,
+} from "./sceneGuard";
 
 /**
  * Self-hosted copy of the Spline scene. The original is served from S3 uncompressed
@@ -15,6 +21,34 @@ export const SCENE_TIMEOUT_MS = 12_000;
 
 let app: Application | null = null;
 let boundCanvas: HTMLCanvasElement | null = null;
+
+/**
+ * Marks the hero as rendering at reduced resolution. The actual reduction is a CSS rule in
+ * globals.css that shrinks the canvas box and scales it back up visually.
+ *
+ * It is done in CSS rather than through the runtime's setSize() on purpose. The runtime
+ * keeps a ResizeObserver on the canvas and re-derives the drawing buffer from the element's
+ * own box, so any setSize() we make is reverted the next time that observer fires — measured
+ * directly: the buffer was back to the full 3840x2122 by the time the page had settled, and
+ * a one-frame re-assert did not survive either. Shrinking the box instead means the reduced
+ * buffer is what the runtime computes for itself, so there is nothing to fight. Verified
+ * stable at 0.6 x DPR across repeated resizes.
+ */
+function applyReducedResolution(): void {
+  const wrap = one("#splineWrap");
+  if (wrap) wrap.dataset.sceneQuality = "reduced";
+}
+
+/**
+ * Sizes the drawing buffer to the canvas element's own box.
+ *
+ * The canvas is the right thing to measure in both cases: on the normal path it is 100% of
+ * the wrapper, and on the reduced path it is the 60% box whose size is the whole point.
+ */
+function sizeToCanvas(): void {
+  const canvas = one<HTMLCanvasElement>("#splineCanvas");
+  if (app && canvas) app.setSize(canvas.clientWidth, canvas.clientHeight);
+}
 
 /**
  * Falls the hero back to its static treatment: the canvas is hidden and the CSS backdrop
@@ -60,16 +94,27 @@ let released = false;
  */
 export function startSpline(reduced: boolean): Promise<void> {
   const canvas = one<HTMLCanvasElement>("#splineCanvas");
-  const wrap = one("#splineWrap");
   released = false;
   if (!canvas) return Promise.resolve();
 
-  // Memory-constrained devices never touch the scene: no fetch, no Application, no GL
-  // context. Resolving immediately is the correct signal to the loader — the boot animation
-  // still plays out in full (runLoader never cuts phase 1 short), it just does not wait.
-  if (!canRenderHeavyScene()) {
-    showStaticHero();
-    return Promise.resolve();
+  // Phones and tablets get the same scene as everyone else, but they are the devices where
+  // it can exhaust memory, so the attempt is recorded first. If the previous attempt on this
+  // device never reported success, the page was killed mid-load and the scene is not tried
+  // again — see lib/motion/sceneGuard.ts. Resolving immediately is the correct signal to the
+  // loader: the boot animation still plays out in full, it just does not wait for a scene
+  // that is not coming.
+  const constrained = isMemoryConstrainedDevice();
+  if (constrained) {
+    if (!sceneAttemptAllowed()) {
+      showStaticHero();
+      return Promise.resolve();
+    }
+    markSceneAttemptStarted();
+    // A user who leaves mid-load has not crashed, and must not be treated as though they
+    // had. pagehide rather than beforeunload because iOS Safari does not reliably fire
+    // beforeunload; pagehide is the event WebKit actually guarantees here.
+    window.addEventListener("pagehide", clearPendingAttempt);
+    applyReducedResolution();
   }
 
   boundCanvas = canvas;
@@ -80,8 +125,13 @@ export function startSpline(reduced: boolean): Promise<void> {
   app = new Application(canvas, { renderMode: reduced ? "manual" : "auto" });
 
   // A canvas with no width/height attributes has a 300x150 backing store; CSS sizing only
-  // scales the box, not the buffer. Size it to the wrapper before anything renders.
-  if (wrap) app.setSize(wrap.clientWidth, wrap.clientHeight);
+  // scales the box, not the buffer. Size it before anything renders.
+  //
+  // Measured from the canvas rather than the wrapper. On the normal path the canvas is
+  // 100%/100% of the wrapper so the two are the same number, but on the reduced path the
+  // canvas is deliberately smaller — measuring the wrapper there would hand back the full
+  // resolution the reduction exists to avoid.
+  sizeToCanvas();
 
   // interactive MUST stay true. In the runtime's start():
   //   async start(t, { interactive: e = !0, ... }) { … if (e) { new M1(renderer, …) } … }
@@ -100,6 +150,15 @@ export function startSpline(reduced: boolean): Promise<void> {
       if (!res.ok) throw new Error(`scene ${res.status}`);
       const buf = await res.arrayBuffer();
       await app?.start(buf, { interactive: true });
+
+      // Cleared only once start() has resolved. The memory ceiling is hit during the GPU
+      // upload inside start(), not during the fetch, so clearing any earlier would mark a
+      // load successful that had not yet survived the part that kills the tab.
+      if (constrained) {
+        markSceneAttemptSucceeded();
+        window.removeEventListener("pagehide", clearPendingAttempt);
+      }
+
       if (reduced) {
         // 'manual' render mode: one frame, no loop. Nothing to hold.
         app?.requestRender();
@@ -112,7 +171,14 @@ export function startSpline(reduced: boolean): Promise<void> {
       }
     } catch (err) {
       // Swallowed on purpose — the page must still reveal and be usable without the scene.
+      // A throw is a normal failure the page survived (bad response, corrupt buffer), not
+      // the out-of-memory kill the breaker exists for, so the pending attempt is cleared
+      // rather than left to trip it.
       console.error("[x2q0] Spline scene failed to load:", err);
+      if (constrained) {
+        clearPendingAttempt();
+        window.removeEventListener("pagehide", clearPendingAttempt);
+      }
       showStaticHero();
     }
   })();
@@ -150,13 +216,15 @@ export function releaseSpline(): void {
 }
 
 export function resizeSpline(): void {
-  const wrap = one("#splineWrap");
-  if (app && wrap) app.setSize(wrap.clientWidth, wrap.clientHeight);
+  sizeToCanvas();
 }
 
 export function disposeSpline(): void {
   boundCanvas?.removeEventListener("webglcontextlost", onContextLost);
   boundCanvas = null;
+  window.removeEventListener("pagehide", clearPendingAttempt);
+  // An unmount is a clean exit, not a crash, so any in-flight attempt is retracted.
+  clearPendingAttempt();
   app?.dispose();
   app = null;
   released = false;

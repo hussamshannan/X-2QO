@@ -28,21 +28,27 @@
 }
 
 /* Static hero, shown when lib/motion/hero.ts sets data-scene="off" — a device that cannot
-   hold the 36 MB scene in memory, a failed scene fetch, or a lost GL context. Kept as a
-   gradient rather than a poster image so the fallback costs no extra bytes on exactly the
-   devices that could not afford the scene. The scroll timeline scales #splineWrap, so this
-   still gets the same push-in as the live scene would have.
-   The matching rule that hides the canvas is in globals.css — see the note there. */
+   hold the 36 MB scene in memory, a failed scene fetch, or a lost GL context.
+   The matching rule that hides the canvas is in globals.css — see the note there.
+
+   A frame captured from the scene itself, so the fallback is the hero rather than a stand-in
+   for it: 37 KB against the 36.2 MB the scene would have cost these devices. It deliberately
+   lives at /hero-poster.webp and not under /scene/, because next.config.ts rewrites the
+   Content-Type of everything under /scene/ to application/json for the .splinecode and that
+   would stop a browser treating this as an image.
+
+   background-size: contain, because the scene's camera does not reframe for a portrait
+   viewport — it crops. Cropping to fill a phone screen would cut the composition down to a
+   couple of letterforms with the figure outside the frame, so the whole frame is kept and
+   the letterboxing is invisible against a background that is already var(--bg).
+
+   The scroll timeline scales #splineWrap, so this gets the same push-in as the live scene. */
 .splineWrap[data-scene="off"] {
-  background:
-    radial-gradient(
-      120% 90% at 50% 42%,
-      rgba(var(--accent-rgb), 0.22) 0%,
-      rgba(var(--accent-rgb), 0.06) 38%,
-      rgba(var(--accent-rgb), 0) 68%
-    ),
-    radial-gradient(90% 70% at 50% 115%, rgba(237, 233, 227, 0.07) 0%, rgba(237, 233, 227, 0) 60%),
-    var(--bg);
+  background-color: var(--bg);
+  background-image: url("/hero-poster.webp");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 /* Swallows pointer events over the Spline canvas so it cannot capture scroll.

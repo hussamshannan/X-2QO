@@ -60,28 +60,29 @@
   --dark-45: rgba(5, 5, 5, 0.62); /* source .45 */
   --dark-line-16: rgba(5, 5, 5, 0.16); /* rule, decorative — verbatim */
 
-  --font-display: 'Kiloy', sans-serif;
-  --font-head: 'Givonic', sans-serif;
+  --font-display: "Kiloy", sans-serif;
+  --font-head: "Givonic", sans-serif;
 }
 
 /* Self-hosted display faces. Source used font-display:block; kept, because both faces
    carry brand-critical glyphs (Kiloy: logo + every numeral; Givonic: every headline)
    and a swap would be a visible flash of the wrong typeface. */
+
 @font-face {
-  font-family: 'Kiloy';
+  font-family: "Kiloy";
   src:
-    url('/fonts/Kiloy.woff2') format('woff2'),
-    url('/fonts/Kiloy.otf') format('opentype');
+    url("/fonts/Kiloy.woff2") format("woff2"),
+    url("/fonts/Kiloy.otf") format("opentype");
   font-display: block;
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Givonic';
+  font-family: "Givonic";
   src:
-    url('/fonts/Givonic-Regular.woff2') format('woff2'),
-    url('/fonts/Givonic-Regular.otf') format('opentype');
+    url("/fonts/Givonic-Regular.woff2") format("woff2"),
+    url("/fonts/Givonic-Regular.otf") format("opentype");
   font-display: block;
   font-weight: 400;
   font-style: normal;

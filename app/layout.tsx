@@ -13,9 +13,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "X–2Q0 — Embodied intelligence research platform",
+  title: "X–2QO — Embodied intelligence research platform",
   description:
-    "X–2Q0 is a research platform for embodied intelligence — an investigation into how perception, balance and reasoning collapse into one continuous loop, running entirely on the body.",
+    "X–2QO is a research platform for embodied intelligence — an investigation into how perception, balance and reasoning collapse into one continuous loop, running entirely on the body.",
 };
 
 export const viewport: Viewport = {

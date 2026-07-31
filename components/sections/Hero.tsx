@@ -7,6 +7,7 @@ import styles from "./Hero.module.css";
  * with the boot animation, and the loader holds its reveal until the scene is ready.
  */
 export default function Hero() {
+  
   return (
     <section
       id="hero"

@@ -10,10 +10,10 @@ import { canRenderHeavyScene, one } from "./dom";
  *
  * The filename carries a version because that cache header is `immutable, max-age=1y`:
  * overwriting the file in place would leave browsers and the CDN serving the old bytes for
- * a year. Re-exporting from Spline means bumping this to -v3 and renaming the file to match,
+ * a year. Re-exporting from Spline means bumping this to -v4 and renaming the file to match,
  * which is what actually busts it.
  */
-const SCENE_URL = "/scene/x2q0-v2.splinecode";
+const SCENE_URL = "/scene/x2q0-v3.splinecode";
 
 /** How long the boot screen is willing to wait for the scene before revealing anyway. */
 export const SCENE_TIMEOUT_MS = 12_000;
@@ -153,10 +153,16 @@ export function releaseSpline(): void {
   //
   // Measured: fetch 78ms (cached) vs start() 518ms, so deferring start() to the reveal
   // instead would mean half a second of empty hero. Replaying the event is the cheap path.
-  const events = app.getSplineEvents();
-  const targets = Object.entries(events)
-    .filter(([, map]) => map && "start" in map)
-    .map(([uuid]) => uuid);
+  // getSplineEvents() is keyed EVENT NAME -> { OBJECT UUID: ... }, not the other way round.
+  // Verified against this scene, which returns:
+  //   { lookAt: { <Head Pivot> }, start: { <look at>, <Camera 2> }, follow: { <look at> } }
+  //
+  // This previously read the outer key as an object uuid and looked for "start" inside the
+  // inner map, which matched nothing — so the replay silently never fired and play() resumed
+  // the scene wherever its clock had drifted to, which showed up as the opening move snapping
+  // rather than playing. The warning below never fired either, because the empty result came
+  // from the wrong lookup rather than from a scene with no start event.
+  const targets = Object.keys(app.getSplineEvents().start ?? {});
 
   if (!targets.length) {
     console.warn("[x2q0] no Spline 'start' event found; opening animation will not replay");

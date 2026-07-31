@@ -62,9 +62,32 @@ export function canRenderHeavyScene(): boolean {
   const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
   if (typeof mem === "number" && mem < 4) return false;
 
-  if (!window.matchMedia("(pointer: coarse)").matches) return true;
+  return !isHandheld();
+}
+
+/**
+ * The media queries isHandheld() reads. Exported so a component can subscribe to exactly the
+ * things that can change its answer, rather than guessing at a width breakpoint.
+ */
+export const HANDHELD_QUERIES = [
+  "(pointer: coarse)",
+  "(any-pointer: fine)",
+  `(max-width: ${PHONE_MAX_PX}px)`,
+] as const;
+
+/**
+ * Touch-first hardware at handheld size — phones and tablets.
+ *
+ * A coarse PRIMARY pointer means the device is touch-first; touchscreen laptops are not
+ * caught because their primary pointer is the trackpad. Within that, either no mouse
+ * available anywhere or a handheld-sized viewport marks it as one. See canRenderHeavyScene()
+ * above for why both terms are needed rather than just the pointer one.
+ */
+export function isHandheld(): boolean {
+  if (typeof window === "undefined") return false;
+  if (!window.matchMedia("(pointer: coarse)").matches) return false;
 
   const noMouse = !window.matchMedia("(any-pointer: fine)").matches;
   const phoneSized = window.matchMedia(`(max-width: ${PHONE_MAX_PX}px)`).matches;
-  return !(noMouse || phoneSized);
+  return noMouse || phoneSized;
 }

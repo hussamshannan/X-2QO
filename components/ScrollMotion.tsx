@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { destroyLenis, initLenis } from "@/lib/lenis";
+import { bootAllowed } from "@/lib/motion/bootGate";
 import { hasFinePointer, prefersReducedMotion } from "@/lib/motion/dom";
 import { initAnchors } from "@/lib/motion/anchors";
 import { initCursor } from "@/lib/motion/cursor";
@@ -59,7 +60,21 @@ export default function ScrollMotion() {
     cleanups.push(initSpecs(reduced));
 
     ScrollTrigger.refresh();
-    cleanups.push(runLoader(reduced, sceneReady));
+
+    // The boot sequence waits behind the handheld advisory panel. Started directly, it would
+    // play out and finish while the panel was still covering it, so dismissing would reveal a
+    // page whose boot screen had already gone. bootAllowed() resolves immediately on every
+    // device that has no panel to show. See lib/motion/bootGate.ts.
+    let loaderCleanup: (() => void) | null = null;
+    let unmounted = false;
+    bootAllowed().then(() => {
+      if (unmounted) return;
+      loaderCleanup = runLoader(reduced, sceneReady);
+    });
+    cleanups.push(() => {
+      unmounted = true;
+      loaderCleanup?.();
+    });
 
     if (document.fonts) {
       document.fonts.ready.then(() => ScrollTrigger.refresh());

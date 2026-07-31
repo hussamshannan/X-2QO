@@ -1,7 +1,9 @@
 .rotate {
   position: fixed;
   inset: 0;
-  z-index: 10000;
+  /* Above #loader (10001) and the skip link (10002): this panel is shown before the boot
+     screen, not behind it, and nothing should be reachable past it while it is up. */
+  z-index: 10005;
   background: var(--bg);
   display: flex;
   align-items: center;

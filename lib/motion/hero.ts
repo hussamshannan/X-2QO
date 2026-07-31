@@ -10,10 +10,10 @@ import { canRenderHeavyScene, one } from "./dom";
  *
  * The filename carries a version because that cache header is `immutable, max-age=1y`:
  * overwriting the file in place would leave browsers and the CDN serving the old bytes for
- * a year. Re-exporting from Spline means bumping this to -v4 and renaming the file to match,
+ * a year. Re-exporting from Spline means bumping this to -v5 and renaming the file to match,
  * which is what actually busts it.
  */
-const SCENE_URL = "/scene/x2q0-v3.splinecode";
+const SCENE_URL = "/scene/x2q0-v4.splinecode";
 
 /** How long the boot screen is willing to wait for the scene before revealing anyway. */
 export const SCENE_TIMEOUT_MS = 12_000;

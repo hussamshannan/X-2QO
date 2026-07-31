@@ -105,6 +105,17 @@ export function startSpline(reduced: boolean): Promise<void> {
       if (!res.ok) throw new Error(`scene ${res.status}`);
       const buf = await res.arrayBuffer();
       await app?.start(buf, { interactive: true });
+
+      // The scene's Follow / LookAt events track the pointer, and by default the runtime
+      // listens for that on the canvas itself — where nothing ever arrives, because
+      // #heroShield sits above it and swallows pointer events so the scene cannot capture
+      // scroll. Verified: elementFromPoint at the centre of the hero returns #heroShield,
+      // and disabling its pointer-events made the figure track the cursor immediately.
+      //
+      // Global events move those listeners to the window, so the pointer is tracked through
+      // the shield and the shield keeps doing the one job it exists for. Removing the shield
+      // instead would trade this bug for the scroll-capture one it was added to fix.
+      app?.setGlobalEvents(true);
       if (reduced) {
         // 'manual' render mode: one frame, no loop. Nothing to hold.
         app?.requestRender();

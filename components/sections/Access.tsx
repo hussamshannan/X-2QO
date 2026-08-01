@@ -31,7 +31,7 @@ export default function Access() {
       {/* Explicit role because a <footer> nested inside <section> gets no implicit
           contentinfo role — without it the page has no contentinfo landmark at all.
           It stays inside the section: its margin-top/border-top positioning depends on it. */}
-      <footer role="contentinfo" className={styles.footer}>
+      <footer data-m="foot" role="contentinfo" className={styles.footer}>
         <span className={styles.footerText}>
           X–2QO · Embodied intelligence research platform
         </span>

@@ -23,11 +23,19 @@ export default function Loader() {
             </span>
             <span className={styles.pct}>%</span>
           </div>
-          <div className={styles.readout}>
+          <div data-load-side className={styles.readout}>
+            {/* One tick per entry in LOGS (lib/motion/loader.ts), lit as the boot advances.
+                display:none until the mobile block reveals it — on desktop the counter and
+                log line already carry progress and the ticks would be noise. */}
+            <span data-load-steps className={styles.steps} aria-hidden="true">
+              {Array.from({ length: 5 }, (_, i) => (
+                <span key={i} data-step className={styles.step} />
+              ))}
+            </span>
             <span data-load-log className={styles.log}>
               initialising actuator bus
             </span>
-            <span className={styles.timing}>
+            <span data-load-sense className={styles.timing}>
               sense &rarr; actuation &middot; 38 ms
             </span>
           </div>

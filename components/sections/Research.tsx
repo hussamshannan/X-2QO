@@ -60,7 +60,7 @@ export default function Research() {
         VECTORS
       </div>
 
-      <div className={styles.eyebrowRow}>
+      <div data-m="rhead" className={styles.eyebrowRow}>
         <span className={styles.eyebrowNum}>02</span>
         <span id="research-heading" className={styles.eyebrowText}>
           Research vectors
@@ -69,8 +69,8 @@ export default function Research() {
 
       {/* data-vec-grid / data-vec-stack are layout hooks for the "no pinned timeline"
           fallback in globals.css (reduced motion, and no-JS). Not styling attributes. */}
-      <div data-vec-grid className={styles.contentGrid}>
-        <div data-vec-stack className={styles.vecStack}>
+      <div data-m="vecwrap" data-vec-grid className={styles.contentGrid}>
+        <div data-m="vecstack" data-vec-stack className={styles.vecStack}>
           {VECTORS.map((v) => (
             <div key={v.vec} data-vec={v.vec} className={styles.vec}>
               <span className={styles.vecNum}>{v.num}</span>
@@ -90,7 +90,7 @@ export default function Research() {
           ))}
         </div>
 
-        <div className={styles.indexCol}>
+        <div data-m="vindex" className={styles.indexCol}>
           <span className={styles.indexLabel}>Index</span>
           {VECTORS.map((v) => (
             <button

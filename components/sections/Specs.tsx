@@ -102,6 +102,21 @@ const RIGHT_CELLS = [
   },
 ];
 
+/*
+ * The mobile ledger regroups the same cells the desktop matrix uses — envelope figures
+ * together, then sense/power/compute — rather than the left/right split the blueprint needs.
+ * Derived from the arrays above rather than restated, so the two can never drift apart.
+ */
+const ENVELOPE_CELLS = [...LEFT_CELLS.slice(0, 3), RIGHT_CELLS[0]];
+const SENSE_CELLS = [LEFT_CELLS[3], ...RIGHT_CELLS.slice(1)];
+
+/** Measure rules on the mobile elevation panel, as a fraction down the box. */
+const MOBILE_MEASURES = [
+  { label: "shoulder 1.42", top: "26%" },
+  { label: "hip 0.98", top: "52%" },
+  { label: "knee 0.52", top: "76%" },
+];
+
 const LATENCY_ROWS = [
   {
     label: "X–2QO on-device",
@@ -272,7 +287,7 @@ export default function Specs() {
         </div>
       </div>
 
-      <div className={styles.latencyGrid}>
+      <div data-m="lat" className={styles.latencyGrid}>
         <div className={styles.latencyIntro}>
           <h3 className={styles.latencyHeading}>DECISION LATENCY</h3>
           <p className={styles.latencyText}>
@@ -308,6 +323,130 @@ export default function Specs() {
             </div>
           ))}
           <div className={styles.latencyCloseRule} />
+        </div>
+      </div>
+
+      {/* Mobile ledger. The desktop blueprint (#specGrid) and the latency grid stand down
+          under 768px and this takes over — see the mobile block in globals.css. It carries the
+          same [data-cell]/[data-metric]/[data-bar] hooks, so lib/motion/specs.ts drives it
+          without knowing which of the two is on screen. */}
+      <div id="specMobile" className={styles.specMobile}>
+        <div className={styles.mElevation}>
+          <span data-ghost="1" aria-hidden="true" className={styles.mGhost}>
+            2q0
+          </span>
+          <span className={styles.mDivider} aria-hidden="true" />
+          {MOBILE_MEASURES.map((m) => (
+            <span key={m.label} className={styles.mMeasure} style={{ top: m.top }}>
+              <span className={styles.mMeasureRule} aria-hidden="true" />
+              <span className={styles.mMeasureLabel}>{m.label}</span>
+            </span>
+          ))}
+          <span className={styles.mHeight}>1.86 m</span>
+          <span className={styles.mSheet}>elevation · sheet 03 / a</span>
+        </div>
+
+        <span className={styles.mGroup}>Physical envelope</span>
+        {ENVELOPE_CELLS.map((cell) => (
+          <div key={cell.label} data-cell="" className={styles.mCell}>
+            <div className={styles.mCellHead}>
+              <span className={styles.mCellLabel}>{cell.label}</span>
+              <span className={styles.mCellValue}>
+                <span
+                  data-metric=""
+                  data-to={cell.to}
+                  data-dec={cell.dec}
+                  className={styles.mCellNumber}
+                >
+                  {cell.value}
+                </span>
+                <span className={styles.mCellUnit}>{cell.unit}</span>
+              </span>
+            </div>
+            <div className={styles.mCellBarRow}>
+              <span className={styles.mCellTrack}>
+                <span data-bar="" data-pct={cell.subTo} className={styles.mCellBar} />
+              </span>
+              <span
+                data-metric=""
+                data-to={cell.subTo}
+                data-dec={cell.subDec}
+                data-suffix="%"
+                className={styles.mCellPct}
+              >
+                {cell.subValue}
+              </span>
+            </div>
+            <span className={styles.mCellSub}>{cell.subLabel}</span>
+          </div>
+        ))}
+
+        <span className={styles.mGroup}>Sense, power and compute</span>
+        {SENSE_CELLS.map((cell) => (
+          <div key={cell.label} data-cell="" className={styles.mCell}>
+            <div className={styles.mCellHead}>
+              <span className={styles.mCellLabel}>{cell.label}</span>
+              <span className={styles.mCellValue}>
+                <span
+                  data-metric=""
+                  data-to={cell.to}
+                  data-dec={cell.dec}
+                  className={styles.mCellNumber}
+                >
+                  {cell.value}
+                </span>
+                <span className={styles.mCellUnit}>{cell.unit}</span>
+              </span>
+            </div>
+            <div className={styles.mCellBarRow}>
+              <span className={styles.mCellTrack}>
+                <span data-bar="" data-pct={cell.subTo} className={styles.mCellBar} />
+              </span>
+              <span
+                data-metric=""
+                data-to={cell.subTo}
+                data-dec={cell.subDec}
+                data-suffix="%"
+                className={styles.mCellPct}
+              >
+                {cell.subValue}
+              </span>
+            </div>
+            <span className={styles.mCellSub}>{cell.subLabel}</span>
+          </div>
+        ))}
+
+        <div className={styles.mLatency}>
+          <h3 className={styles.latencyHeading}>DECISION LATENCY</h3>
+          <p className={styles.latencyText}>
+            The loop closes on the body. Nothing leaves the chassis, so nothing waits for a
+            network.
+          </p>
+          {LATENCY_ROWS.map((row) => (
+            <div key={row.label} data-lrow="" className={styles.mLrow}>
+              <div className={styles.mLrowHead}>
+                <span className={styles.mCellLabel}>{row.label}</span>
+                <span className={styles.mCellValue}>
+                  <span
+                    data-metric=""
+                    data-to={row.to}
+                    data-dec={row.dec}
+                    className={styles.mCellNumber}
+                  >
+                    {row.value}
+                  </span>
+                  <span className={styles.mCellUnit}>ms</span>
+                </span>
+              </div>
+              <span className={styles.mCellTrack}>
+                <span
+                  data-bar=""
+                  data-pct={row.pct}
+                  className={`${styles.mCellBar} ${row.barClass}`}
+                />
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </section>

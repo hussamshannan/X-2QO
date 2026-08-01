@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import { q } from "./dom";
+import { one, q } from "./dom";
 
 /**
  * Spec matrix: counters run up, bars fill, cells stagger in, hovering a cell dims its siblings.
@@ -11,6 +11,14 @@ import { q } from "./dom";
 export function initSpecs(reduced: boolean): () => void {
   const cells = q("[data-cell]");
   const cleanups: Array<() => void> = [];
+
+  // The blueprint and the mobile ledger both ship, and one of them is always display:none.
+  // The stagger below has to hang off whichever is actually laid out — triggering on a
+  // display:none element gives ScrollTrigger a zero-height target that never resolves, which
+  // would leave the mobile cells stuck at the opacity:0 they start from. offsetParent is null
+  // exactly when an element is display:none, so it is the cheapest way to ask.
+  const grid = one("#specGrid");
+  const revealTrigger = grid?.offsetParent ? grid : (one("#specMobile") ?? grid);
 
   if (!reduced) {
     q("[data-metric]").forEach((el) => {
@@ -60,7 +68,7 @@ export function initSpecs(reduced: boolean): () => void {
         duration: 0.9,
         ease: "expo.out",
         stagger: 0.05,
-        scrollTrigger: { trigger: "#specGrid", start: "top 86%" },
+        scrollTrigger: { trigger: revealTrigger ?? "#specGrid", start: "top 86%" },
       },
     );
 

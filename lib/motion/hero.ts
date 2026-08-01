@@ -15,6 +15,19 @@ import { canRenderHeavyScene, one } from "./dom";
  */
 const SCENE_URL = "/scene/x2q0-v4.splinecode";
 
+/**
+ * Spline's own hosted viewer, used on handhelds instead of the self-hosted binary.
+ *
+ * The runtime path costs 36.3 MB of scene data on top of the page, which overruns the per-tab
+ * memory ceiling on iOS Safari — measured, and it took the tab down with it. The embed is a
+ * separate document, so the scene is loaded and rendered outside this page's budget.
+ *
+ * Not a free swap: it carries Spline's watermark, and a cross-origin frame re-rasters on every
+ * transform, which is why buildHero() drops the hero scale scrub on this path.
+ */
+const SCENE_EMBED_URL =
+  "https://my.spline.design/nexbotrobotcharacterconcept-lu2y3wCsB8lzLePYOfMBRkUz/";
+
 /** How long the boot screen is willing to wait for the scene before revealing anyway. */
 export const SCENE_TIMEOUT_MS = 12_000;
 
@@ -29,6 +42,25 @@ let boundCanvas: HTMLCanvasElement | null = null;
 function showStaticHero(): void {
   const wrap = one("#splineWrap");
   if (wrap) wrap.dataset.scene = "off";
+}
+
+/**
+ * Hands the hero to Spline's hosted embed instead of the local runtime.
+ *
+ * Setting src here rather than in the markup is the point: the iframe ships with no src at
+ * all, so desktop never requests the embed, and this is the only thing that starts it.
+ *
+ * Returns false if the iframe is missing, so the caller can fall back to the static frame
+ * rather than leaving the hero empty.
+ */
+function showEmbeddedScene(): boolean {
+  const wrap = one("#splineWrap");
+  const frame = one<HTMLIFrameElement>("#splineFrame");
+  if (!wrap || !frame) return false;
+
+  wrap.dataset.scene = "frame";
+  if (!frame.src) frame.src = SCENE_EMBED_URL;
+  return true;
 }
 
 /**
@@ -69,11 +101,15 @@ export function startSpline(reduced: boolean): Promise<void> {
   released = false;
   if (!canvas) return Promise.resolve();
 
-  // Memory-constrained devices never touch the scene: no fetch, no Application, no GL
-  // context. Resolving immediately is the correct signal to the loader — the boot animation
-  // still plays out in full (runLoader never cuts phase 1 short), it just does not wait.
+  // Memory-constrained devices never touch the self-hosted scene: no fetch, no Application,
+  // no GL context in this document. They get Spline's hosted embed instead, which carries the
+  // same scene in its own document and so outside this page's memory budget.
+  //
+  // Resolving immediately is the correct signal to the loader — the boot animation still plays
+  // out in full (runLoader never cuts phase 1 short), it just does not wait. There is nothing
+  // to wait for: the embed is cross-origin, so its progress is not observable from here.
   if (!canRenderHeavyScene()) {
-    showStaticHero();
+    if (!showEmbeddedScene()) showStaticHero();
     return Promise.resolve();
   }
 
@@ -231,29 +267,40 @@ export function buildHero(reduced: boolean): () => void {
     return cleanup;
   }
 
-  gsap
-    .timeline({
-      scrollTrigger: {
-        trigger: "#hero",
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-      },
-    })
-    .fromTo("#splineWrap", { scale: 1 }, { scale: 1.18, ease: "none" }, 0)
-    .fromTo("#heroVeil", { opacity: 0 }, { opacity: 1, ease: "none" }, 0)
-    .to("#cue", { opacity: 0, duration: 0.2, ease: "none" }, 0);
+  // The push-in is dropped when the hero is an embed. Scaling a <canvas> transforms a texture
+  // that has already been rasterised, which is cheap; scaling a cross-origin iframe re-rasters
+  // live content every frame, which is the exact cost this file moved away from. The veil and
+  // cue still animate — opacity stays on the compositor either way.
+  const embedded = wrap?.dataset.scene === "frame";
 
-  // will-change is set only while the hero is being scrubbed, so the promoted layer isn't
-  // held in GPU memory for the rest of the session.
-  ScrollTrigger.create({
-    trigger: "#hero",
-    start: "top top",
-    end: "bottom top",
-    onToggle: ({ isActive }) => {
-      if (wrap) wrap.style.willChange = isActive ? "transform" : "auto";
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: "#hero",
+      start: "top top",
+      end: "bottom top",
+      scrub: true,
     },
   });
+  if (!embedded) tl.fromTo("#splineWrap", { scale: 1 }, { scale: 1.18, ease: "none" }, 0);
+  tl.fromTo("#heroVeil", { opacity: 0 }, { opacity: 1, ease: "none" }, 0).to(
+    "#cue",
+    { opacity: 0, duration: 0.2, ease: "none" },
+    0,
+  );
+
+  // will-change is set only while the hero is being scrubbed, so the promoted layer isn't
+  // held in GPU memory for the rest of the session. Skipped for the embed, which is not
+  // being transformed and would only be promoted for nothing.
+  if (!embedded) {
+    ScrollTrigger.create({
+      trigger: "#hero",
+      start: "top top",
+      end: "bottom top",
+      onToggle: ({ isActive }) => {
+        if (wrap) wrap.style.willChange = isActive ? "transform" : "auto";
+      },
+    });
+  }
 
   return cleanup;
 }

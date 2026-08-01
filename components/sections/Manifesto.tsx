@@ -12,7 +12,7 @@ export default function Manifesto() {
       <div data-ghost="1" aria-hidden="true" className={styles.ghost}>
         2qo
       </div>
-      <div className={styles.grid}>
+      <div data-m="man" className={styles.grid}>
         <div className={styles.left}>
           <span className={styles.eyebrow}>01 — Manifesto</span>
           <h2

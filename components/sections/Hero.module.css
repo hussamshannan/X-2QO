@@ -27,6 +27,16 @@
   outline: none;
 }
 
+/* Hidden until lib/motion/hero.ts sets data-scene="frame" on the wrapper, which is also when
+   its src is set. The rules that actually swap canvas for iframe live in globals.css, because
+   `#splineWrap canvas` there is an ID selector with !important and outranks this file. */
+.splineFrame {
+  display: none;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 /* Static hero, shown when lib/motion/hero.ts sets data-scene="off" — a device that cannot
    hold the 36 MB scene in memory, a failed scene fetch, or a lost GL context.
    The matching rule that hides the canvas is in globals.css — see the note there.
@@ -124,4 +134,146 @@
   text-transform: uppercase;
   color: var(--ink-40);
   line-height: 2;
+}
+
+/* ── Mobile hero ────────────────────────────────────────────────────────────────────────
+   Everything below is display:none until the max-width:768px block in globals.css reveals
+   it, so none of it reaches desktop. Values are ported from the mobile layer of
+   X-2Q0.dc.html. */
+
+/* Lifts the type off the scene. Bottom-weighted: transparent over the figure in the upper
+   field, solid var(--bg) by the time it reaches the copy. */
+.heroScrim {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 64%;
+  z-index: 3;
+  background: linear-gradient(
+    to bottom,
+    rgba(5, 5, 5, 0) 0%,
+    rgba(5, 5, 5, 0.55) 30%,
+    rgba(5, 5, 5, 0.93) 66%,
+    var(--bg) 88%
+  );
+  pointer-events: none;
+}
+
+.heroMobile {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 5vw 24px;
+  /* The scene behind stays reachable; nothing in here is interactive. */
+  pointer-events: none;
+}
+
+/* Zero-size so the rail can hang off it without taking part in the column layout. */
+.heroRailAnchor {
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+.heroRail {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 22px);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 8.5px;
+  font-weight: 300;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+}
+
+.heroMobileBody {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.heroEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.heroEyebrowRule {
+  display: block;
+  width: 16px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.heroEyebrowText {
+  font-size: 8.5px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-50);
+}
+
+.heroMobileHeading {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 400;
+  font-size: clamp(38px, 12.4vw, 72px);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.heroMobileAccent {
+  color: var(--accent);
+}
+
+.heroMobileCopy {
+  margin: 0;
+  max-width: 30ch;
+  text-wrap: pretty;
+  font-size: 12.5px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ink-55);
+}
+
+.heroMobileFoot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-13);
+}
+
+/* Shorter than the desktop cue: it sits in a 16px-padded row, not free in the corner. */
+.heroMobileCueLine {
+  display: block;
+  width: 1px;
+  height: 22px;
+  background: linear-gradient(var(--accent), rgba(var(--accent-rgb), 0));
+  animation: cue 2.6s ease-in-out infinite;
+}
+
+.heroMobileCueText {
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-50);
+}
+
+.heroMobileYear {
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 1;
+  color: var(--ink-40);
 }

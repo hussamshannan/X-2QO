@@ -102,11 +102,22 @@ export function runLoader(reduced: boolean, sceneReady: Promise<void>): () => vo
   window.scrollTo(0, 0);
   stopScroll();
 
+  // One tick per LOGS entry, mobile only (hidden on desktop). Every tick up to and including
+  // the current one is lit, so the row reads as progress rather than a moving dot — and it
+  // stays correct when the hold phase cycles the log back round to the start.
+  const steps = q("[data-load-steps] [data-step]");
+  const litUpTo = (i: number) =>
+    steps.forEach((s, n) => {
+      if (n <= i) s.setAttribute("data-on", "");
+      else s.removeAttribute("data-on");
+    });
+
   let logIndex = -1;
   const showLog = (i: number) => {
     if (!logEl || i === logIndex) return;
     logIndex = i;
     logEl.textContent = LOGS[i];
+    litUpTo(i);
     gsap.fromTo(
       logEl,
       { opacity: 0, y: 5 },

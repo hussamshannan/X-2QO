@@ -106,3 +106,23 @@
   width: 0%;
   background: var(--accent);
 }
+
+/* Progress ticks — mobile only. Hidden here and revealed by the max-width:768px block in
+   globals.css; lib/motion/loader.ts lights them as the boot log advances. */
+.steps {
+  display: none;
+  gap: 5px;
+  padding-bottom: 4px;
+}
+
+.step {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--dark-line-16);
+  transition: background 0.3s ease;
+}
+
+.step[data-on] {
+  background: var(--accent-on-light);
+}

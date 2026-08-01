@@ -434,3 +434,209 @@
   height: 1px;
   background: var(--line-11);
 }
+
+/* ── Mobile ledger ──────────────────────────────────────────────────────────────────────
+   Hidden here and revealed by the max-width:768px block in globals.css, which also stands
+   #specGrid and [data-m="lat"] down. Ported from the mobile layer of X-2Q0.dc.html. */
+.specMobile {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mElevation {
+  position: relative;
+  height: 196px;
+  margin-bottom: 34px;
+  border: 1px dashed var(--line-16);
+  overflow: hidden;
+}
+
+.mGhost {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: 78px;
+  line-height: 0.8;
+  color: var(--ink);
+  opacity: 0.06;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.mDivider {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line-09);
+}
+
+.mMeasure {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.mMeasureRule {
+  flex: 1;
+  height: 1px;
+  background: var(--line-12);
+}
+
+.mMeasureLabel {
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+  white-space: nowrap;
+}
+
+.mHeight,
+.mSheet {
+  position: absolute;
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.mHeight {
+  left: 10px;
+  bottom: 10px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0;
+  color: var(--accent);
+}
+
+.mSheet {
+  right: 10px;
+  bottom: 10px;
+  color: var(--ink-30);
+}
+
+/* Section rule + label. First one has no top border — the elevation panel above already
+   closes the space. */
+.mGroup {
+  padding: 26px 0 18px;
+  border-top: 1px solid var(--line-13);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-50);
+}
+
+.mCell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line-09);
+}
+
+.mCellHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.mCellLabel {
+  font-size: 11.5px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-55);
+}
+
+.mCellValue {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.mCellNumber {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.mCellUnit {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+}
+
+.mCellBarRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mCellTrack {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  background: var(--line-11);
+}
+
+.mCellBar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--accent);
+}
+
+.mCellPct {
+  min-width: 4ch;
+  text-align: right;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: var(--ink-50);
+}
+
+.mCellSub {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: var(--ink-40);
+}
+
+.mLatency {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 34px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line-16);
+}
+
+.mLrow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+}
+
+.mLrowHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+}

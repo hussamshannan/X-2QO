@@ -42,7 +42,7 @@ export default function Log() {
         </span>
         <span className={styles.eyebrowRule} />
       </div>
-      <div className={styles.grid}>
+      <div data-m="loggrid" className={styles.grid}>
         {ROWS.map((r) => (
           <div key={r.year + r.quarter} data-row="" className={styles.row}>
             <span className={styles.date}>

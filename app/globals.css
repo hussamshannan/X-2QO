@@ -168,8 +168,24 @@ a:hover {
    backdrop itself lives in Hero.module.css; only this canvas override has to be here,
    because `#splineWrap canvas` above is an ID selector and outranks anything the CSS module
    can write with classes alone. */
-#splineWrap[data-scene="off"] canvas {
+#splineWrap[data-scene="off"] canvas,
+#splineWrap[data-scene="off"] iframe {
   display: none;
+}
+
+/* Handhelds run the hero as Spline's hosted embed rather than the local runtime — see
+   SCENE_EMBED_URL in lib/motion/hero.ts. Exactly one renderer is ever visible, and which one
+   is decided in JS rather than by a media query, so the CSS cannot disagree with the code
+   about which path is live. Both rules have to be here because `#splineWrap canvas` above is
+   an ID selector with !important and outranks anything Hero.module.css can write. */
+#splineWrap[data-scene="frame"] canvas {
+  display: none;
+}
+
+#splineWrap[data-scene="frame"] iframe {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Sections are anchor focus targets (tabindex=-1) so anchor navigation moves focus,
@@ -267,4 +283,304 @@ html[data-flow-vectors] #s-research [data-vec] {
   position: relative;
   inset: auto;
   padding: 6vh 0;
+}
+
+/* ── Mobile layer ───────────────────────────────────────────────────────────────────────
+ * Ported from the max-width:768px block of X-2Q0.dc.html.
+ *
+ * It lives here rather than in the CSS modules because the design's selectors are global and
+ * ID-based (#hero, #splineWrap, #loader …), and several of them have to outrank the
+ * !important ID rules earlier in this file. Nothing in here is reachable above 768px, so
+ * desktop is unaffected by the block's existence rather than by a runtime check.
+ *
+ * The breakpoint is the design's. Scene delivery uses its own, wider threshold
+ * (PHONE_MAX_PX in lib/motion/dom.ts) — a 769–1024px touch device therefore gets the desktop
+ * layout with the embedded scene, which is the intended pairing.
+ */
+@media (max-width: 768px) {
+  body {
+    cursor: auto;
+  }
+
+  #rotate,
+  #cursorRing,
+  #cursorDot,
+  #cursorLabel,
+  #cue,
+  #heroMeta {
+    display: none !important;
+  }
+
+  /* Hero — the scene becomes a cropped sprite in the upper field, type owns the base.
+     svh rather than vh so the browser chrome collapsing does not resize the hero mid-scroll. */
+  #hero {
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+  }
+
+  #splineWrap {
+    inset: auto !important;
+    left: 50% !important;
+    top: -4svh !important;
+    width: 200vw !important;
+    height: 112vw !important;
+    transform: translateX(-72%);
+    contain: layout paint;
+  }
+
+  #splineWrap canvas,
+  #splineWrap iframe {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  #heroScrim {
+    display: block !important;
+  }
+
+  #heroMobile {
+    display: flex !important;
+  }
+
+  #heroRailAnchor {
+    align-self: flex-start;
+  }
+
+  /* Short viewports have no room for the rail beside the type. */
+  @media (max-height: 719px) {
+    #heroRail {
+      display: none;
+    }
+  }
+
+  nav {
+    padding: 18px 5vw !important;
+  }
+
+  #menuBtn {
+    padding: 11px 0 11px 14px !important;
+  }
+
+  #menuOverlay {
+    padding: 0 5vw !important;
+  }
+
+  .ov-link {
+    gap: 16px !important;
+  }
+
+  /* Manifesto */
+  #s-manifesto {
+    padding: 16vh 5vw 12vh !important;
+  }
+
+  [data-m="man"] {
+    grid-template-columns: 1fr !important;
+    gap: 36px !important;
+    align-items: start !important;
+  }
+
+  [data-m="man"] > div:last-child {
+    border-left: 0 !important;
+    border-top: 1px solid var(--line-13);
+    padding-left: 0 !important;
+    padding-top: 28px;
+  }
+
+  /* Loader — counter owns the middle, log and ticks sit under it. */
+  #loader [data-load-inner] {
+    padding: 22px 5vw 0 !important;
+  }
+
+  #loader [data-load-item]:nth-child(2) {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 20px !important;
+    padding-bottom: 9vh !important;
+  }
+
+  #loader [data-load-num] {
+    font-size: clamp(120px, 42vw, 210px) !important;
+  }
+
+  #loader [data-load-item]:nth-child(2) > div:first-child {
+    gap: 8px !important;
+  }
+
+  #loader [data-load-side] {
+    align-items: flex-start !important;
+    text-align: left !important;
+    padding-bottom: 0 !important;
+    gap: 14px !important;
+    width: 100%;
+  }
+
+  #loader [data-load-steps] {
+    display: flex !important;
+  }
+
+  #loader [data-load-sense] {
+    padding-top: 2px;
+  }
+
+  #loader [data-load-item]:nth-child(3) {
+    height: 2px !important;
+    margin: 0 -5vw !important;
+  }
+
+  #loader [data-load-bar] {
+    height: 2px !important;
+  }
+
+  /* Research — each vector becomes its own sheet, index as a bleeding watermark. */
+  #s-research {
+    height: auto !important;
+    padding: 15vh 5vw 12vh;
+  }
+
+  [data-m="rhead"] {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    padding-bottom: 44px;
+  }
+
+  [data-m="vecwrap"] {
+    position: relative !important;
+    inset: auto !important;
+    display: block !important;
+  }
+
+  [data-m="vecstack"] {
+    height: auto !important;
+    display: flex;
+    flex-direction: column;
+    gap: 58px;
+  }
+
+  #s-research [data-vec] {
+    position: relative !important;
+    inset: auto !important;
+    display: block !important;
+    padding-top: 24px;
+    border-top: 1px solid var(--line-16);
+    overflow: hidden;
+  }
+
+  #s-research [data-vec] > span:first-child {
+    position: absolute !important;
+    right: -3vw;
+    top: 6px;
+    font-size: 27vw !important;
+    line-height: 0.72 !important;
+    color: rgba(237, 233, 227, 0.07) !important;
+    pointer-events: none;
+  }
+
+  #s-research [data-vec] > div {
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    gap: 20px !important;
+  }
+
+  #s-research [data-vec] h3 {
+    font-size: clamp(34px, 11vw, 60px) !important;
+    max-width: 8ch;
+  }
+
+  #s-research [data-vec] p {
+    font-size: 13.5px !important;
+    max-width: 36ch;
+  }
+
+  #s-research [data-vec] > div > div {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 !important;
+    padding-top: 14px !important;
+    border-top: 1px solid var(--line-13);
+  }
+
+  #s-research [data-vec] > div > div > div {
+    padding: 14px 0;
+    gap: 8px !important;
+  }
+
+  #s-research [data-vec] > div > div > div:last-child {
+    padding-left: 20px;
+    border-left: 1px solid var(--line-13);
+  }
+
+  #s-research [data-vec] > div > div span:last-child {
+    font-size: 22px !important;
+  }
+
+  [data-m="vindex"],
+  [data-m="vhint"] {
+    display: none !important;
+  }
+
+  /* Specs — the desktop blueprint stands down; mobile gets its own vertical ledger. */
+  #s-specs {
+    padding: 14vh 5vw 12vh !important;
+  }
+
+  #specGrid,
+  [data-m="lat"],
+  [data-m="specnote-d"] {
+    display: none !important;
+  }
+
+  [data-m="specnote-m"] {
+    display: inline !important;
+  }
+
+  #specMobile {
+    display: flex !important;
+  }
+
+  #s-specs > div:first-child {
+    flex-wrap: wrap;
+    gap: 12px !important;
+    padding-bottom: 30px !important;
+  }
+
+  #s-specs > div:first-child > span:nth-child(3) {
+    min-width: 24px;
+  }
+
+  /* Log + access */
+  #s-log {
+    padding: 0 5vw 14vh !important;
+  }
+
+  [data-m="loggrid"] {
+    grid-template-columns: 1fr !important;
+    gap: 34px !important;
+  }
+
+  #s-access {
+    padding: 14vh 5vw 5vh !important;
+  }
+
+  #s-access h2 {
+    font-size: clamp(32px, 9vw, 52px) !important;
+  }
+
+  #s-access a[href^="mailto"] {
+    padding: 19px 26px !important;
+  }
+
+  [data-m="foot"] {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+    margin-top: 12vh !important;
+  }
+
+  [data-ghost] {
+    opacity: 0.022 !important;
+  }
 }

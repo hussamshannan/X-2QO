@@ -26,6 +26,21 @@ export function hasFinePointer(): boolean {
 const PHONE_MAX_PX = 1024;
 
 /**
+ * The design's mobile layout breakpoint. Must stay in step with the @media (max-width: 768px)
+ * block in globals.css — motion that depends on that layout reads this rather than guessing.
+ *
+ * Deliberately narrower than PHONE_MAX_PX above, which governs scene delivery instead. A
+ * 769–1024px touch device therefore gets the desktop layout with the embedded scene.
+ */
+const MOBILE_MAX_PX = 768;
+
+/** Whether the mobile layout in globals.css is the one currently applied. */
+export function isMobileLayout(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia(`(max-width: ${MOBILE_MAX_PX}px)`).matches;
+}
+
+/**
  * Whether this device should be given the Spline scene at all.
  *
  * The scene binary is 36.2 MB uncompressed. Decoding it into an ArrayBuffer and then into
@@ -64,16 +79,6 @@ export function canRenderHeavyScene(): boolean {
 
   return !isHandheld();
 }
-
-/**
- * The media queries isHandheld() reads. Exported so a component can subscribe to exactly the
- * things that can change its answer, rather than guessing at a width breakpoint.
- */
-export const HANDHELD_QUERIES = [
-  "(pointer: coarse)",
-  "(any-pointer: fine)",
-  `(max-width: ${PHONE_MAX_PX}px)`,
-] as const;
 
 /**
  * Touch-first hardware at handheld size — phones and tablets.

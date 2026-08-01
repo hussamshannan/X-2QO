@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import type { ScrollTrigger as ScrollTriggerType } from "gsap/ScrollTrigger";
 import { getLenis } from "../lenis";
-import { one, q } from "./dom";
+import { isMobileLayout, one, q } from "./dom";
 import { syncCursorLabel } from "./cursor";
 import { getActiveVector, setActiveVector } from "./state";
 
@@ -51,10 +51,20 @@ export function initVectors(reduced: boolean): () => void {
 
   setActiveVector(-1);
 
-  if (reduced) {
-    // No pin, no cross-fade. The section becomes ordinary stacked content (see the
-    // html[data-flow-vectors] rules in globals.css), all four vectors readable at once.
-    document.documentElement.setAttribute("data-flow-vectors", "");
+  // The mobile layout already flattens this section to height:auto and stacks the vectors as
+  // sheets. Pinning it anyway would pin a section whose height no longer matches what the pin
+  // was measured against, and every ScrollTrigger further down the page — the spec ledger
+  // most visibly — would resolve against stale positions and never fire.
+  const mobile = isMobileLayout();
+
+  if (reduced || mobile) {
+    // No pin, no cross-fade: ordinary stacked content, all four vectors readable at once.
+    //
+    // The data-flow-vectors stylesheet is the *desktop* fallback for this, and is only needed
+    // when nothing else has flattened the section. Under the mobile layout something has, and
+    // setting it would let `html[data-flow-vectors] #s-research` (0,2,1) outrank the design's
+    // own `#s-research` rule (0,1,0) and restore desktop padding on a phone.
+    if (!mobile) document.documentElement.setAttribute("data-flow-vectors", "");
     setActiveVector(0);
     markVector(0);
     const cleanups = jumps.map((btn, i) => {
@@ -67,7 +77,7 @@ export function initVectors(reduced: boolean): () => void {
       return () => btn.removeEventListener("click", handler);
     });
     return () => {
-      document.documentElement.removeAttribute("data-flow-vectors");
+      if (!mobile) document.documentElement.removeAttribute("data-flow-vectors");
       cleanups.forEach((fn) => fn());
     };
   }

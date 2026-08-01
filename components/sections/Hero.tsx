@@ -3,14 +3,9 @@ import styles from "./Hero.module.css";
 /*
  * #splineWrap must always be present in the DOM — a ScrollTrigger captures it at boot.
  *
- * Two renderers live in here and exactly one is ever shown, chosen by lib/motion/hero.ts:
- *
- *   <canvas>  desktop. The Spline runtime is constructed against it, so it has to be
- *             server-rendered and present before mount.
- *   <iframe>  handhelds. Deliberately has no src attribute — an empty string would make some
- *             browsers load the current document — so nothing is fetched until hero.ts sets
- *             it. That is what keeps desktop from paying for the embed and handhelds from
- *             paying for the 36 MB self-hosted scene.
+ * The <canvas> is server-rendered because the Spline runtime is constructed against it on
+ * mount. Handhelds never get that far: lib/motion/hero.ts leaves the canvas alone and shows a
+ * captured frame of the scene instead, so the 36 MB binary is never fetched there.
  *
  * #heroScrim and #heroMobile are the mobile treatment and are display:none until the
  * max-width:768px block in globals.css reveals them, so desktop is unaffected by their
@@ -32,7 +27,6 @@ export default function Hero() {
         {/* Decorative: #heroShield makes it non-interactive and the visually hidden <h1>
             above already names the hero. */}
         <canvas id="splineCanvas" className={styles.splineCanvas} aria-hidden="true" />
-        <iframe id="splineFrame" title="X-2QO" className={styles.splineFrame} />
       </div>
       <div id="heroShield" className={styles.heroShield} />
       <div id="heroVeil" className={styles.heroVeil} />

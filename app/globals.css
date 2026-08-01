@@ -168,25 +168,10 @@ a:hover {
    backdrop itself lives in Hero.module.css; only this canvas override has to be here,
    because `#splineWrap canvas` above is an ID selector and outranks anything the CSS module
    can write with classes alone. */
-#splineWrap[data-scene="off"] canvas,
-#splineWrap[data-scene="off"] iframe {
+#splineWrap[data-scene="off"] canvas {
   display: none;
 }
 
-/* Handhelds run the hero as Spline's hosted embed rather than the local runtime — see
-   SCENE_EMBED_URL in lib/motion/hero.ts. Exactly one renderer is ever visible, and which one
-   is decided in JS rather than by a media query, so the CSS cannot disagree with the code
-   about which path is live. Both rules have to be here because `#splineWrap canvas` above is
-   an ID selector with !important and outranks anything Hero.module.css can write. */
-#splineWrap[data-scene="frame"] canvas {
-  display: none;
-}
-
-#splineWrap[data-scene="frame"] iframe {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-}
 
 /* Sections are anchor focus targets (tabindex=-1) so anchor navigation moves focus,
    not just scroll position. No visible ring for that programmatic focus. */
@@ -329,8 +314,7 @@ html[data-flow-vectors] #s-research [data-vec] {
     contain: layout paint;
   }
 
-  #splineWrap canvas,
-  #splineWrap iframe {
+  #splineWrap canvas {
     width: 100% !important;
     height: 100% !important;
   }

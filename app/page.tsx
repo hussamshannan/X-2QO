@@ -1,6 +1,5 @@
 import Cursor from "@/components/Cursor";
 import Loader from "@/components/Loader";
-import RotateGate from "@/components/RotateGate";
 import ScrollMotion from "@/components/ScrollMotion";
 import SiteChrome from "@/components/SiteChrome";
 import Access from "@/components/sections/Access";
@@ -19,7 +18,6 @@ export default function Page() {
 
       <Loader />
       <Cursor />
-      <RotateGate />
       <SiteChrome />
 
       <main id="main">
